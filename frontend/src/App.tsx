@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import AboutUs from './components/AboutUs';
+import OurFounder from './components/OurFounder';
+import HowWeWork from './components/HowWeWork';
 import Process from './components/Process';
 import WhyUs from './components/WhyUs';
+import Testimonials from './components/Testimonials';
 import EstimateCalculator from './components/EstimateCalculator';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -13,10 +16,12 @@ import AdminPanel from './components/AdminPanel';
 import ProfileSetup from './components/ProfileSetup';
 import { Toaster } from '@/components/ui/sonner';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile } from './hooks/useQueries';
+import { useGetCallerUserProfile, useIsCallerAdmin } from './hooks/useQueries';
 
 function App() {
   const aboutRef = useRef<HTMLElement>(null);
+  const founderRef = useRef<HTMLElement>(null);
+  const howWeWorkRef = useRef<HTMLElement>(null);
   const processRef = useRef<HTMLElement>(null);
   const whyUsRef = useRef<HTMLElement>(null);
   const calculatorRef = useRef<HTMLElement>(null);
@@ -27,6 +32,7 @@ function App() {
   const isAuthenticated = !!identity;
 
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const { data: isAdmin } = useIsCallerAdmin();
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
@@ -53,6 +59,8 @@ function App() {
 
     const refs: Record<string, React.RefObject<HTMLElement | null>> = {
       about: aboutRef,
+      founder: founderRef,
+      'how-we-work': howWeWorkRef,
       process: processRef,
       whyus: whyUsRef,
       calculator: calculatorRef,
@@ -62,7 +70,7 @@ function App() {
 
     const ref = refs[sectionId];
     if (ref?.current) {
-      const headerOffset = 80;
+      const headerOffset = 112;
       const elementPosition = ref.current.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -83,7 +91,21 @@ function App() {
   if (showAdminPanel) {
     return (
       <>
-        <AdminPanel onBack={() => setShowAdminPanel(false)} />
+        <div className="min-h-screen bg-gray-50">
+          <div className="bg-black/80 backdrop-blur-md shadow-lg">
+            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+              <button
+                onClick={() => setShowAdminPanel(false)}
+                className="flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors"
+              >
+                ← Back to Site
+              </button>
+              <span className="text-white font-bold text-lg">Urban Thekedaar — Admin</span>
+              <div className="w-24" />
+            </div>
+          </div>
+          <AdminPanel />
+        </div>
         <Toaster />
       </>
     );
@@ -93,13 +115,18 @@ function App() {
     <div className="min-h-screen bg-background">
       <Header onNavigate={scrollToSection} />
       <main>
-        <Hero onNavigate={scrollToSection} />
+        <Hero />
         <AboutUs ref={aboutRef} />
+        <OurFounder ref={founderRef} />
+        <HowWeWork ref={howWeWorkRef} />
         <Process ref={processRef} />
         <WhyUs ref={whyUsRef} />
-        <EstimateCalculator ref={calculatorRef} />
+        <Testimonials />
+        <section ref={calculatorRef}>
+          <EstimateCalculator />
+        </section>
         <Contact ref={contactRef} />
-        {isAuthenticated && <AdminInquiries ref={adminRef} />}
+        {isAuthenticated && isAdmin && <AdminInquiries ref={adminRef} />}
       </main>
       <Footer />
       <Chatbot />

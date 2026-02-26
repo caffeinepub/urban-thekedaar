@@ -1,138 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Chatbot Q&A + Query Form, Calculator Lead Capture, and Admin Panel",
+  "title": "Remove login requirement for form submissions & style tagline",
   "projectName": "Urban Thekedaar",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a floating chatbot component with keyword-based automated Q&A covering Urban Thekedaar's services, pricing, bookings, and FAQs. The chatbot must match user input against predefined keywords and return relevant responses about construction services, cost ranges, booking process, and common questions.",
-      "target": "frontend",
+      "text": "Remove Internet Identity authentication requirement from all public-facing form submissions. The Contact form, Estimate Calculator, and Chatbot query submission form must allow anonymous users to submit without logging in. Authentication should only be required for the admin panel.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "Chatbot with keyword-based Q&A covering services, pricing, bookings & FAQs"
+          "login not required for submission of forms"
         ]
       },
       "acceptanceCriteria": [
-        "Chatbot widget is visible and accessible on the site as a floating button",
-        "Typing service-related keywords returns a relevant predefined answer",
-        "Typing pricing-related keywords returns cost/pricing information",
-        "Typing booking-related keywords returns booking process information",
-        "Unanswered queries prompt the user to use the query form"
+        "A user who is not logged in can submit the Contact form successfully",
+        "A user who is not logged in can submit the Estimate Calculator form successfully",
+        "A user who is not logged in can submit a query via the Chatbot form successfully",
+        "The admin panel still requires Internet Identity login to access",
+        "Backend actor accepts anonymous calls for submitQueryForm, submitContactForm, and submitCalculatorLead"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a query form inside or alongside the chatbot (or as a dedicated section) that collects: name, phone, email, service type (dropdown), and message. On submission, the data must be stored in the backend and a confirmation message shown to the user.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "a query form (name, phone, email, service type, message) with data stored on-site"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Query form has fields: name, phone, email, service type (dropdown), message",
-        "Form validates required fields before submission",
-        "Submitted data is persisted in the backend canister",
-        "User sees a success confirmation after submission"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Update the backend to store query form submissions with fields: name, phone, email, service type, and message. Expose a method to submit a query and a method (admin-only) to retrieve all query submissions.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "data stored on-site"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend has a submitQuery method accepting name, phone, email, serviceType, message",
-        "Backend has a getQueries method that returns all stored query submissions",
-        "Data persists across canister upgrades"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Update the EstimateCalculator component and backend to include name and mobile number fields. These fields must be collected alongside the existing estimate inputs and stored as calculator leads in the backend.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Calculator (likely cost/service estimator) with name and mobile number fields added",
-          "save the data people for using calculator add name and mobile also in calculator"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Calculator form includes a name field and a mobile number field",
-        "Name and mobile are required before submitting the estimate",
-        "Submitted calculator leads (name, mobile, project details) are stored in the backend",
-        "Backend exposes a method to retrieve calculator leads (admin-only)"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Create an Admin Panel page/section accessible via a hardcoded username and password login (no Internet Identity required). Once logged in, the admin can view all submitted query form entries and all calculator leads in separate tabs or sections. The hardcoded credentials must be defined as constants in the frontend code.",
+      "text": "In the Hero section, style the tagline text 'urbantheekedaar we build structures that last generations' to be big, bold, and orange in color.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4",
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "Admin panel with a hardcoded login (username + password) to view submitted queries and calculator leads"
+          "urbantheekedaar we build structures that last generations to be in same font size and orange colour",
+          "big and bold font size"
         ]
       },
       "acceptanceCriteria": [
-        "A login screen with username and password fields is shown before accessing the admin panel",
-        "Entering the correct hardcoded credentials grants access to the admin panel",
-        "Entering wrong credentials shows an error message",
-        "Admin panel displays all query form submissions with name, phone, email, service type, and message",
-        "Admin panel displays all calculator leads with name, mobile, and project details",
-        "Submissions and leads are displayed in a readable table or card list",
-        "Admin can log out and return to the login screen"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Update the backend to store calculator leads with fields: name, mobile, and all existing estimate inputs (project type, area, floors, quality tier, address). Expose an admin-only method to retrieve all calculator leads.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "save the data people for using calculator add name and mobile also in calculator",
-          "Admin panel with a hardcoded login (username + password) to view submitted queries and calculator leads"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend has a submitCalculatorLead method that stores name, mobile, and estimate inputs",
-        "Backend has a getCalculatorLeads method that returns all stored leads",
-        "Data persists across canister upgrades"
+        "The text 'urbantheekedaar we build structures that last generations' is displayed in a large font size",
+        "The text is bold (font-weight bold or semibold)",
+        "The text color is orange"
       ]
     }
   ],
   "constraints": [
-    "Admin panel login must use hardcoded credentials stored in frontend constants — no Internet Identity required for admin login",
-    "All data storage must use the existing single Motoko actor in backend/main.mo",
-    "Do not modify files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
+    "Admin panel must remain protected behind Internet Identity authentication",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Real-time AI or LLM-based chatbot responses",
-    "Email notifications on form submission",
-    "Payment or booking transaction processing",
-    "Multi-role admin user management"
+    "Adding new authentication methods",
+    "Changing the admin panel access control",
+    "Redesigning the overall layout or color theme"
   ],
   "imageRequirements": {
     "required": [],

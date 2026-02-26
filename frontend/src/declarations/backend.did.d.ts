@@ -25,6 +25,12 @@ export interface CalculatorLead {
   'areaInSqFt' : number,
   'numFloors' : bigint,
 }
+export interface ContactForm {
+  'name' : string,
+  'email' : string,
+  'message' : string,
+  'phone' : string,
+}
 export interface EstimateResponse {
   'breakdown' : string,
   'estimatedCost' : bigint,
@@ -59,12 +65,17 @@ export interface _SERVICE {
     EstimateResponse
   >,
   'getAllCalculatorLeads' : ActorMethod<[], Array<CalculatorLead>>,
+  'getAllContactForms' : ActorMethod<[], Array<ContactForm>>,
   'getAllQueryForms' : ActorMethod<[], Array<QueryForm>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'submitContactForm' : ActorMethod<
+    [string, string, string, string],
+    undefined
+  >,
   'submitQueryForm' : ActorMethod<
     [string, string, string, string, string],
     undefined

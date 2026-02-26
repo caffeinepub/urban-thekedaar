@@ -1,372 +1,374 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { LogOut, ShieldCheck, AlertCircle, RefreshCw } from 'lucide-react';
-import { useGetAllQueryForms, useGetAllCalculatorLeads } from '@/hooks/useQueries';
+  Shield, LogOut, Users, FileText, Loader2, Mail, Phone,
+  MessageSquare, Tag, MapPin, Calculator, AlertTriangle
+} from 'lucide-react';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useQueryClient } from '@tanstack/react-query';
+import { useIsCallerAdmin, useGetAllQueryForms, useGetAllCalculatorLeads, useGetAllContactForms } from '../hooks/useQueries';
+import type { QueryForm, CalculatorLead, ContactForm } from '../backend';
 
-// Hardcoded admin credentials
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'urbanadmin2024';
+type TabType = 'queries' | 'contacts' | 'leads';
 
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-2 text-sm">
+      <Icon className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+      <div>
+        <span className="text-gray-500 text-xs">{label}: </span>
+        <span className="text-gray-800 font-medium">{value}</span>
+      </div>
+    </div>
+  );
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+function QueryCard({ form, index }: { form: QueryForm; index: number }) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+          #{index + 1}
+        </span>
+        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{form.serviceType}</span>
+      </div>
+      <h4 className="font-bold text-gray-900 mb-3">{form.name}</h4>
+      <div className="space-y-1.5">
+        <InfoRow icon={Phone} label="Phone" value={form.phone} />
+        <InfoRow icon={Mail} label="Email" value={form.email} />
+        <InfoRow icon={Tag} label="Service" value={form.serviceType} />
+        <InfoRow icon={MessageSquare} label="Message" value={form.message} />
+      </div>
+    </div>
+  );
+}
 
-    setTimeout(() => {
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        onLogin();
-      } else {
-        setError('Invalid username or password. Please try again.');
-      }
-      setIsLoading(false);
-    }, 400);
+function ContactCard({ form, index }: { form: ContactForm; index: number }) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+          #{index + 1}
+        </span>
+      </div>
+      <h4 className="font-bold text-gray-900 mb-3">{form.name}</h4>
+      <div className="space-y-1.5">
+        <InfoRow icon={Phone} label="Phone" value={form.phone} />
+        <InfoRow icon={Mail} label="Email" value={form.email} />
+        <InfoRow icon={MessageSquare} label="Message" value={form.message} />
+      </div>
+    </div>
+  );
+}
+
+function LeadCard({ lead, index }: { lead: CalculatorLead; index: number }) {
+  const formatArea = (area: number) => `${area.toLocaleString('en-IN')} sq ft`;
+  const formatAddress = (lead: CalculatorLead) =>
+    [lead.address.street, `#${lead.address.number}`, lead.address.city, lead.address.postalCode]
+      .filter(Boolean)
+      .join(', ');
+
+  return (
+    <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+          #{index + 1}
+        </span>
+        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{lead.qualityTier}</span>
+      </div>
+      <h4 className="font-bold text-gray-900 mb-3">{lead.name}</h4>
+      <div className="space-y-1.5">
+        <InfoRow icon={Phone} label="Mobile" value={lead.mobile} />
+        <InfoRow icon={Tag} label="Project" value={lead.projectType} />
+        <InfoRow icon={Calculator} label="Area" value={formatArea(lead.areaInSqFt)} />
+        <InfoRow icon={Users} label="Floors" value={`${lead.numFloors} floor(s)`} />
+        <InfoRow icon={MapPin} label="Location" value={formatAddress(lead)} />
+      </div>
+    </div>
+  );
+}
+
+export default function AdminPanel() {
+  const [activeTab, setActiveTab] = useState<TabType>('queries');
+
+  const { identity, login, clear, loginStatus } = useInternetIdentity();
+  const queryClient = useQueryClient();
+  const isAuthenticated = !!identity;
+  const isLoggingIn = loginStatus === 'logging-in';
+
+  const { data: isAdmin, isLoading: adminLoading } = useIsCallerAdmin();
+
+  const isAdminUser = isAuthenticated && isAdmin === true;
+
+  const queryFormsQuery = useGetAllQueryForms(isAdminUser);
+  const contactFormsQuery = useGetAllContactForms(isAdminUser);
+  const calculatorLeadsQuery = useGetAllCalculatorLeads(isAdminUser);
+
+  const handleLogin = async () => {
+    try {
+      await login();
+    } catch (err) {
+      // handled by loginStatus
+    }
   };
 
+  const handleLogout = async () => {
+    await clear();
+    queryClient.clear();
+  };
+
+  // Not logged in
+  if (!isAuthenticated) {
+    return (
+      <section id="admin" className="py-20 bg-gray-50 min-h-screen">
+        <div className="max-w-md mx-auto px-4">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Admin Panel</h2>
+              <p className="text-gray-500 mt-1">Sign in with Internet Identity to access the dashboard</p>
+            </div>
+
+            <button
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {isLoggingIn ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4" />
+                  Sign In with Internet Identity
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Logged in but not admin
+  if (!adminLoading && !isAdmin) {
+    return (
+      <section id="admin" className="py-20 bg-gray-50 min-h-screen">
+        <div className="max-w-md mx-auto px-4">
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+            <p className="text-gray-500 mb-6">
+              You don't have admin privileges to access this panel.
+            </p>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-all text-sm font-medium mx-auto"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Loading admin status
+  if (adminLoading) {
+    return (
+      <section id="admin" className="py-20 bg-gray-50 min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  const tabs: { id: TabType; label: string; icon: React.ElementType; count: number | undefined; color: string }[] = [
+    {
+      id: 'queries',
+      label: 'Query Forms',
+      icon: FileText,
+      count: queryFormsQuery.data?.length,
+      color: 'text-primary',
+    },
+    {
+      id: 'contacts',
+      label: 'Contact Forms',
+      icon: Mail,
+      count: contactFormsQuery.data?.length,
+      color: 'text-blue-600',
+    },
+    {
+      id: 'leads',
+      label: 'Calculator Leads',
+      icon: Calculator,
+      count: calculatorLeadsQuery.data?.length,
+      color: 'text-green-600',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <Card className="w-full max-w-md border-2">
-        <CardHeader className="text-center pb-4">
-          <div className="flex justify-center mb-3">
-            <div className="h-14 w-14 rounded-full bg-primary flex items-center justify-center">
-              <ShieldCheck className="h-7 w-7 text-primary-foreground" />
+    <section id="admin" className="py-20 bg-gray-50 min-h-screen">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Shield className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+              <p className="text-gray-500 text-sm">Manage all inquiries and leads</p>
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Admin Panel</CardTitle>
-          <p className="text-sm text-muted-foreground">Urban Thekedaar — Restricted Access</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="admin-username">Username</Label>
-              <Input
-                id="admin-username"
-                type="text"
-                placeholder="Enter username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoComplete="username"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="admin-password">Password</Label>
-              <Input
-                id="admin-password"
-                type="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
-          <p className="text-xs text-center text-muted-foreground mt-4">
-            This panel is for authorized personnel only.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function QueryFormsTable() {
-  const { data: queryForms, isLoading, isError, refetch, isFetching } = useGetAllQueryForms();
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-16 w-full" />
-        ))}
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load query forms. You may need to be logged in as an admin on the main site.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  const forms = queryForms ?? [];
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Total submissions:</span>
-          <Badge variant="secondary">{forms.length}</Badge>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-all text-sm font-medium"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
-        <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
-      </div>
 
-      {forms.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <p className="text-lg font-medium">No query submissions yet</p>
-          <p className="text-sm mt-1">Submissions will appear here once users fill out the query form.</p>
-        </div>
-      ) : (
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Service Type</TableHead>
-                <TableHead>Message</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {forms.map((form, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium text-muted-foreground">{index + 1}</TableCell>
-                  <TableCell className="font-medium">{form.name}</TableCell>
-                  <TableCell>{form.phone}</TableCell>
-                  <TableCell>{form.email}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{form.serviceType}</Badge>
-                  </TableCell>
-                  <TableCell className="max-w-[200px]">
-                    <p className="truncate text-sm text-muted-foreground" title={form.message}>
-                      {form.message}
-                    </p>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CalculatorLeadsTable() {
-  const { data: leads, isLoading, isError, refetch, isFetching } = useGetAllCalculatorLeads();
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-16 w-full" />
-        ))}
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load calculator leads. You may need to be logged in as an admin on the main site.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  const allLeads = leads ?? [];
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Total leads:</span>
-          <Badge variant="secondary">{allLeads.length}</Badge>
-        </div>
-        <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
-      </div>
-
-      {allLeads.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <p className="text-lg font-medium">No calculator leads yet</p>
-          <p className="text-sm mt-1">Leads will appear here once users submit the estimate calculator.</p>
-        </div>
-      ) : (
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Mobile</TableHead>
-                <TableHead>Project Type</TableHead>
-                <TableHead>Area (sq.ft)</TableHead>
-                <TableHead>Floors</TableHead>
-                <TableHead>Quality</TableHead>
-                <TableHead>Location</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {allLeads.map((lead, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium text-muted-foreground">{index + 1}</TableCell>
-                  <TableCell className="font-medium">{lead.name}</TableCell>
-                  <TableCell>{lead.mobile}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{lead.projectType}</Badge>
-                  </TableCell>
-                  <TableCell>{lead.areaInSqFt.toLocaleString('en-IN')}</TableCell>
-                  <TableCell>{lead.numFloors.toString()}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        lead.qualityTier === 'Luxury'
-                          ? 'default'
-                          : lead.qualityTier === 'Premium'
-                          ? 'secondary'
-                          : 'outline'
-                      }
-                    >
-                      {lead.qualityTier}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {lead.address.city}
-                    {lead.address.street ? `, ${lead.address.street}` : ''}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface AdminPanelProps {
-  onBack: () => void;
-}
-
-export default function AdminPanel({ onBack }: AdminPanelProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  if (!isLoggedIn) {
-    return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Admin Header */}
-      <header className="border-b bg-background/95 backdrop-blur-md sticky top-0 z-10">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-                <ShieldCheck className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="font-bold text-foreground leading-none">Admin Panel</h1>
-                <p className="text-xs text-muted-foreground">Urban Thekedaar</p>
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {tabs.map(tab => (
+            <div key={tab.id} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  tab.id === 'queries' ? 'bg-primary/10' :
+                  tab.id === 'contacts' ? 'bg-blue-50' : 'bg-green-50'
+                }`}>
+                  <tab.icon className={`w-5 h-5 ${tab.color}`} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {tab.id === 'queries' && (queryFormsQuery.isLoading ? '...' : (queryFormsQuery.data?.length ?? 0))}
+                    {tab.id === 'contacts' && (contactFormsQuery.isLoading ? '...' : (contactFormsQuery.data?.length ?? 0))}
+                    {tab.id === 'leads' && (calculatorLeadsQuery.isLoading ? '...' : (calculatorLeadsQuery.data?.length ?? 0))}
+                  </p>
+                  <p className="text-sm text-gray-500">{tab.label}</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={onBack}>
-                ← Back to Site
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsLoggedIn(false)}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="flex border-b border-gray-100">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 py-4 text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+                  activeTab === tab.id
+                    ? `${tab.color} border-b-2 border-current bg-gray-50`
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
               >
-                <LogOut className="h-4 w-4 mr-1.5" />
-                Logout
-              </Button>
-            </div>
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+                {tab.count !== undefined && (
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
+                    activeTab === tab.id ? 'bg-current/10' : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="p-6">
+            {/* Query Forms Tab */}
+            {activeTab === 'queries' && (
+              <div>
+                {queryFormsQuery.isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                ) : queryFormsQuery.isError ? (
+                  <div className="text-center py-12 text-red-500">
+                    <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+                    <p>Failed to load query forms.</p>
+                  </div>
+                ) : !queryFormsQuery.data?.length ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-medium">No query form submissions yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {queryFormsQuery.data.map((form, i) => (
+                      <QueryCard key={i} form={form} index={i} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Contact Forms Tab */}
+            {activeTab === 'contacts' && (
+              <div>
+                {contactFormsQuery.isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                  </div>
+                ) : contactFormsQuery.isError ? (
+                  <div className="text-center py-12 text-red-500">
+                    <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+                    <p>Failed to load contact forms.</p>
+                  </div>
+                ) : !contactFormsQuery.data?.length ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <Mail className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-medium">No contact form submissions yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {contactFormsQuery.data.map((form, i) => (
+                      <ContactCard key={i} form={form} index={i} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Calculator Leads Tab */}
+            {activeTab === 'leads' && (
+              <div>
+                {calculatorLeadsQuery.isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+                  </div>
+                ) : calculatorLeadsQuery.isError ? (
+                  <div className="text-center py-12 text-red-500">
+                    <AlertTriangle className="w-8 h-8 mx-auto mb-2" />
+                    <p>Failed to load calculator leads.</p>
+                  </div>
+                ) : !calculatorLeadsQuery.data?.length ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <Calculator className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-medium">No calculator leads yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {calculatorLeadsQuery.data.map((lead, i) => (
+                      <LeadCard key={i} lead={lead} index={i} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </header>
-
-      {/* Admin Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
-          <p className="text-muted-foreground text-sm mt-1">
-            View all query form submissions and calculator leads.
-          </p>
-        </div>
-
-        <Tabs defaultValue="queries">
-          <TabsList className="mb-6">
-            <TabsTrigger value="queries">📋 Query Submissions</TabsTrigger>
-            <TabsTrigger value="leads">🧮 Calculator Leads</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="queries">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Query Form Submissions</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  All queries submitted via the chatbot query form.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <QueryFormsTable />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="leads">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Calculator Leads</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  All leads captured from the estimate calculator.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <CalculatorLeadsTable />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+      </div>
+    </section>
   );
 }

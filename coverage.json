@@ -1,103 +1,54 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T14:47:38.412Z",
+  "generatedAt": "2026-02-26T17:56:15.884Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
-    "implemented": 4,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add a floating chatbot component with keyword-based automated Q&A covering Urban Thekedaar's services, pricing, bookings, and FAQs. The chatbot must match user input against predefined keywords and return relevant responses about construction services, cost ranges, booking process, and common questions.",
+        "summary": "Remove Internet Identity authentication requirement from all public-facing form submissions. The Contact form, Estimate Calculator, and Chatbot query submission form must allow anonymous users to submit without logging in. Authentication should only be required for the admin panel.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Chatbot.tsx"
+          "frontend/src/components/Contact.tsx",
+          "frontend/src/components/EstimateCalculator.tsx",
+          "frontend/src/components/Chatbot.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
+          "frontend/src/components/Contact.tsx",
+          "frontend/src/components/EstimateCalculator.tsx",
           "frontend/src/components/Chatbot.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add a query form inside or alongside the chatbot (or as a dedicated section) that collects: name, phone, email, service type (dropdown), and message. On submission, the data must be stored in the backend and a confirmation message shown to the user.",
+        "summary": "In the Hero section, style the tagline text 'urbantheekedaar we build structures that last generations' to be big, bold, and orange in color.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Chatbot.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/Hero.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Chatbot.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/Hero.tsx"
         ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Update the backend to store query form submissions with fields: name, phone, email, service type, and message. Expose a method to submit a query and a method (admin-only) to retrieve all query submissions.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Update the EstimateCalculator component and backend to include name and mobile number fields. These fields must be collected alongside the existing estimate inputs and stored as calculator leads in the backend.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/EstimateCalculator.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/EstimateCalculator.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Create an Admin Panel page/section accessible via a hardcoded username and password login (no Internet Identity required). Once logged in, the admin can view all submitted query form entries and all calculator leads in separate tabs or sections. The hardcoded credentials must be defined as constants in the frontend code.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AdminPanel.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Update the backend to store calculator leads with fields: name, mobile, and all existing estimate inputs (project type, area, floors, quality tier, address). Expose an admin-only method to retrieve all calculator leads.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/AdminInquiries.tsx",
-    "frontend/src/components/AdminPanel.tsx",
     "frontend/src/components/Chatbot.tsx",
+    "frontend/src/components/Contact.tsx",
     "frontend/src/components/EstimateCalculator.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/components/Hero.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

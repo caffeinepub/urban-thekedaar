@@ -8,17 +8,20 @@ import { Mail, Phone, MapPin, Loader2, Send } from 'lucide-react';
 import { useSubmitContactForm } from '@/hooks/useQueries';
 import { toast } from 'sonner';
 
+const SERVICE_OPTIONS = ['Residential', 'Commercial', 'Farm House', 'General Inquiry'];
+
 const Contact = forwardRef<HTMLElement>((props, ref) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    serviceType: 'General Inquiry',
     message: '',
   });
 
   const submitMutation = useSubmitContactForm();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.email || !formData.phone || !formData.message) {
@@ -31,19 +34,28 @@ const Contact = forwardRef<HTMLElement>((props, ref) => {
       return;
     }
 
-    submitMutation.mutate(formData, {
-      onSuccess: () => {
-        toast.success('Thank you! Your query has been submitted. We will get back to you soon.');
-        setFormData({ name: '', email: '', phone: '', message: '' });
+    submitMutation.mutate(
+      {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        serviceType: formData.serviceType,
+        message: formData.message,
       },
-      onError: (error: Error) => {
-        toast.error(error.message || 'Failed to submit form. Please try again.');
-      },
-    });
+      {
+        onSuccess: () => {
+          toast.success('Thank you! Your query has been submitted. We will get back to you soon.');
+          setFormData({ name: '', email: '', phone: '', serviceType: 'General Inquiry', message: '' });
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || 'Failed to submit form. Please try again.');
+        },
+      }
+    );
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -70,7 +82,7 @@ const Contact = forwardRef<HTMLElement>((props, ref) => {
             <Card className="border-2">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <Phone className="w-6 h-6 text-primary" />
                   </div>
                   <div>
@@ -84,7 +96,7 @@ const Contact = forwardRef<HTMLElement>((props, ref) => {
             <Card className="border-2">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
                   <div>
@@ -100,7 +112,7 @@ const Contact = forwardRef<HTMLElement>((props, ref) => {
             <Card className="border-2">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <MapPin className="w-6 h-6 text-primary" />
                   </div>
                   <div>
@@ -158,6 +170,21 @@ const Contact = forwardRef<HTMLElement>((props, ref) => {
                       onChange={handleChange}
                       required
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="serviceType">Service Type</Label>
+                    <select
+                      id="serviceType"
+                      name="serviceType"
+                      value={formData.serviceType}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    >
+                      {SERVICE_OPTIONS.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-2">

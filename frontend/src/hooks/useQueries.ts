@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { EstimateResponse, UserProfile, QueryForm, CalculatorLead } from '../backend';
+import type { QueryForm, CalculatorLead, ContactForm, UserProfile, EstimateResponse } from '../backend';
+
+// ── User Profile ─────────────────────────────────────────────────────────────
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -28,7 +30,7 @@ export function useSaveCallerUserProfile() {
 
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not initialized');
+      if (!actor) throw new Error('Actor not available');
       return actor.saveCallerUserProfile(profile);
     },
     onSuccess: () => {
@@ -37,8 +39,10 @@ export function useSaveCallerUserProfile() {
   });
 }
 
+// ── Admin Role Check ──────────────────────────────────────────────────────────
+
 export function useIsCallerAdmin() {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<boolean>({
     queryKey: ['isCallerAdmin'],
@@ -46,111 +50,94 @@ export function useIsCallerAdmin() {
       if (!actor) return false;
       return actor.isCallerAdmin();
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !actorFetching,
   });
 }
 
-// Contact form submission — maps to submitQueryForm with serviceType "General Inquiry"
-export function useSubmitContactForm() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: {
-      name: string;
-      email: string;
-      phone: string;
-      message: string;
-    }) => {
-      if (!actor) throw new Error('Actor not initialized');
-      return actor.submitQueryForm(
-        data.name,
-        data.phone,
-        data.email,
-        'General Inquiry',
-        data.message
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allQueryForms'] });
-    },
-  });
-}
-
-// Returns all query forms — used by AdminInquiries for contact-style submissions
-export function useGetAllContactForms() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<QueryForm[]>({
-    queryKey: ['allQueryForms'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not initialized');
-      return actor.getAllQueryForms();
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
+// ── Query Forms ───────────────────────────────────────────────────────────────
 
 export function useSubmitQueryForm() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
+    mutationFn: async (form: {
       name: string;
       phone: string;
       email: string;
       serviceType: string;
       message: string;
     }) => {
-      if (!actor) throw new Error('Actor not initialized');
-      return actor.submitQueryForm(
-        data.name,
-        data.phone,
-        data.email,
-        data.serviceType,
-        data.message
-      );
+      if (!actor) throw new Error('Actor not available');
+      return actor.submitQueryForm(form.name, form.phone, form.email, form.serviceType, form.message);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allQueryForms'] });
+      queryClient.invalidateQueries({ queryKey: ['queryForms'] });
     },
   });
 }
 
-export function useGetAllQueryForms() {
-  const { actor, isFetching } = useActor();
+export function useGetAllQueryForms(enabled: boolean = true) {
+  const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<QueryForm[]>({
-    queryKey: ['allQueryForms'],
+    queryKey: ['queryForms'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not initialized');
+      if (!actor) throw new Error('Actor not available');
       return actor.getAllQueryForms();
     },
-    enabled: !!actor && !isFetching,
+    enabled: enabled && !!actor && !actorFetching,
+    retry: false,
   });
 }
 
-export function useGetAllCalculatorLeads() {
-  const { actor, isFetching } = useActor();
+// ── Contact Form ──────────────────────────────────────────────────────────────
 
-  return useQuery<CalculatorLead[]>({
-    queryKey: ['allCalculatorLeads'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not initialized');
-      return actor.getAllCalculatorLeads();
+export function useSubmitContactForm() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (form: {
+      name: string;
+      phone: string;
+      email: string;
+      serviceType: string;
+      message: string;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      // Contact form uses submitQueryForm since it captures serviceType too
+      return actor.submitQueryForm(form.name, form.phone, form.email, form.serviceType, form.message);
     },
-    enabled: !!actor && !isFetching,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contactForms'] });
+      queryClient.invalidateQueries({ queryKey: ['queryForms'] });
+    },
   });
 }
+
+export function useGetAllContactForms(enabled: boolean = true) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<ContactForm[]>({
+    queryKey: ['contactForms'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getAllContactForms();
+    },
+    enabled: enabled && !!actor && !actorFetching,
+    retry: false,
+  });
+}
+
+// ── Calculator Leads ──────────────────────────────────────────────────────────
 
 export function useCalculateEstimate() {
   const { actor } = useActor();
+  const queryClient = useQueryClient();
 
-  return useMutation<
-    EstimateResponse,
-    Error,
-    {
+  return useMutation({
+    mutationFn: async (params: {
       name: string;
       mobile: string;
       projectType: string;
@@ -161,22 +148,37 @@ export function useCalculateEstimate() {
       number: bigint;
       city: string;
       postalCode: string;
-    }
-  >({
-    mutationFn: async (data) => {
-      if (!actor) throw new Error('Actor not initialized');
+    }): Promise<EstimateResponse> => {
+      if (!actor) throw new Error('Actor not available');
       return actor.calculateEstimate(
-        data.name,
-        data.mobile,
-        data.projectType,
-        data.areaInSqFt,
-        data.numFloors,
-        data.qualityTier,
-        data.street,
-        data.number,
-        data.city,
-        data.postalCode
+        params.name,
+        params.mobile,
+        params.projectType,
+        params.areaInSqFt,
+        params.numFloors,
+        params.qualityTier,
+        params.street,
+        params.number,
+        params.city,
+        params.postalCode,
       );
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['calculatorLeads'] });
+    },
+  });
+}
+
+export function useGetAllCalculatorLeads(enabled: boolean = true) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<CalculatorLead[]>({
+    queryKey: ['calculatorLeads'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getAllCalculatorLeads();
+    },
+    enabled: enabled && !!actor && !actorFetching,
+    retry: false,
   });
 }

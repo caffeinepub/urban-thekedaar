@@ -2,13 +2,14 @@ import { forwardRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useGetAllContactForms, useIsCallerAdmin } from '@/hooks/useQueries';
-import { Mail, Phone, User, MessageSquare, ShieldAlert, Inbox, Tag } from 'lucide-react';
+import { useGetAllQueryForms, useIsCallerAdmin } from '@/hooks/useQueries';
+import { Mail, Phone, User, MessageSquare, Inbox, Tag } from 'lucide-react';
 
 const AdminInquiries = forwardRef<HTMLElement>((props, ref) => {
   const { data: isAdmin, isLoading: adminLoading } = useIsCallerAdmin();
-  const { data: inquiries, isLoading: inquiriesLoading, error } = useGetAllContactForms();
+  const { data: inquiries, isLoading: inquiriesLoading, error } = useGetAllQueryForms();
 
+  // Return nothing if not admin or still loading admin status
   if (adminLoading) {
     return (
       <section ref={ref} className="py-20 bg-background">
@@ -23,22 +24,9 @@ const AdminInquiries = forwardRef<HTMLElement>((props, ref) => {
     );
   }
 
+  // Return null for non-admins — no "Access Restricted" message
   if (!isAdmin) {
-    return (
-      <section ref={ref} className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-4">
-              <ShieldAlert className="w-16 h-16 text-muted-foreground" />
-            </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Access Restricted</h2>
-            <p className="text-muted-foreground">
-              Only administrators can view submitted inquiries.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
@@ -113,22 +101,22 @@ const AdminInquiries = forwardRef<HTMLElement>((props, ref) => {
                   <CardContent className="space-y-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <Mail className="w-4 h-4 text-primary flex-shrink-0" />
+                        <Mail className="w-4 h-4 text-primary shrink-0" />
                         <span className="break-all">{inquiry.email}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <Phone className="w-4 h-4 text-primary flex-shrink-0" />
+                        <Phone className="w-4 h-4 text-primary shrink-0" />
                         <span>{inquiry.phone}</span>
                       </div>
                     </div>
                     {inquiry.serviceType && inquiry.serviceType !== 'General Inquiry' && (
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <Tag className="w-4 h-4 text-primary flex-shrink-0" />
+                        <Tag className="w-4 h-4 text-primary shrink-0" />
                         <Badge variant="secondary" className="text-xs">{inquiry.serviceType}</Badge>
                       </div>
                     )}
                     <div className="flex items-start space-x-2 text-sm">
-                      <MessageSquare className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                      <MessageSquare className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                       <p className="text-foreground leading-relaxed">{inquiry.message}</p>
                     </div>
                   </CardContent>

@@ -11,12 +11,8 @@ import EstimateCalculator from './components/EstimateCalculator';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
-import AdminInquiries from './components/AdminInquiries';
 import AdminPanel from './components/AdminPanel';
-import ProfileSetup from './components/ProfileSetup';
 import { Toaster } from '@/components/ui/sonner';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile, useIsCallerAdmin } from './hooks/useQueries';
 
 function App() {
   const aboutRef = useRef<HTMLElement>(null);
@@ -26,14 +22,7 @@ function App() {
   const whyUsRef = useRef<HTMLElement>(null);
   const calculatorRef = useRef<HTMLElement>(null);
   const contactRef = useRef<HTMLElement>(null);
-  const adminRef = useRef<HTMLElement>(null);
 
-  const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
-
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
-  const { data: isAdmin } = useIsCallerAdmin();
-  const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Check URL for /admin path on load
@@ -44,12 +33,6 @@ function App() {
       setShowAdminPanel(true);
     }
   }, []);
-
-  useEffect(() => {
-    if (isAuthenticated && !profileLoading && isFetched && userProfile === null) {
-      setShowProfileSetup(true);
-    }
-  }, [isAuthenticated, profileLoading, isFetched, userProfile]);
 
   const scrollToSection = (sectionId: string) => {
     if (sectionId === 'admin-panel') {
@@ -65,7 +48,6 @@ function App() {
       whyus: whyUsRef,
       calculator: calculatorRef,
       contact: contactRef,
-      admin: adminRef,
     };
 
     const ref = refs[sectionId];
@@ -126,14 +108,10 @@ function App() {
           <EstimateCalculator />
         </section>
         <Contact ref={contactRef} />
-        {isAuthenticated && isAdmin && <AdminInquiries ref={adminRef} />}
       </main>
       <Footer />
       <Chatbot />
       <Toaster />
-      {showProfileSetup && (
-        <ProfileSetup onClose={() => setShowProfileSetup(false)} />
-      )}
     </div>
   );
 }

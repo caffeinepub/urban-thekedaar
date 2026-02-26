@@ -1,60 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Remove login requirement for form submissions & style tagline",
+  "title": "Remove profile setup popup, update headline, and fix admin login",
   "projectName": "Urban Thekedaar",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove Internet Identity authentication requirement from all public-facing form submissions. The Contact form, Estimate Calculator, and Chatbot query submission form must allow anonymous users to submit without logging in. Authentication should only be required for the admin panel.",
-      "target": "both",
+      "text": "Remove the 'Set up your profile' popup/modal (ProfileSetup component) so it no longer appears after login or anywhere in the application.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6"
+          "msg-remove-popup"
         ],
         "quotes": [
-          "login not required for submission of forms"
+          "remove the setup your profile",
+          "pop up"
         ]
       },
       "acceptanceCriteria": [
-        "A user who is not logged in can submit the Contact form successfully",
-        "A user who is not logged in can submit the Estimate Calculator form successfully",
-        "A user who is not logged in can submit a query via the Chatbot form successfully",
-        "The admin panel still requires Internet Identity login to access",
-        "Backend actor accepts anonymous calls for submitQueryForm, submitContactForm, and submitCalculatorLead"
+        "The ProfileSetup modal/dialog does not appear after a user logs in.",
+        "No 'Set up your profile' prompt is shown anywhere in the app.",
+        "The ProfileSetup component is either removed or never rendered."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "In the Hero section, style the tagline text 'urbantheekedaar we build structures that last generations' to be big, bold, and orange in color.",
+      "text": "Update the main hero headline in the Hero section to display 'Urban Thekedaar — We build structures for generations' as the primary headline text.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5",
-          "msg-6"
+          "msg-headline"
         ],
         "quotes": [
-          "urbantheekedaar we build structures that last generations to be in same font size and orange colour",
-          "big and bold font size"
+          "change the text Urban thekedaar we build structures for generations as a headline"
         ]
       },
       "acceptanceCriteria": [
-        "The text 'urbantheekedaar we build structures that last generations' is displayed in a large font size",
-        "The text is bold (font-weight bold or semibold)",
-        "The text color is orange"
+        "The Hero section displays 'Urban Thekedaar — We build structures for generations' as the main headline.",
+        "The headline is visually prominent and styled consistently with the existing hero design."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Replace the admin panel's Internet Identity authentication with a hardcoded username/password login form. Use credentials: username 'admin' and password 'admin123'. The admin panel should be accessible only after successfully entering these credentials, with an 'Access Denied' state shown for incorrect credentials.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-admin-login"
+        ],
+        "quotes": [
+          "i am unable to login in admin panel saying access denied",
+          "hardcoded username and password",
+          "use default and build"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The admin panel shows a login form with username and password fields instead of (or before) Internet Identity login.",
+        "Entering 'admin' / 'admin123' grants access to the admin dashboard.",
+        "Entering incorrect credentials shows an error message (e.g., 'Access Denied' or 'Invalid credentials').",
+        "After successful login, the admin panel content is fully accessible.",
+        "The admin session persists until the user logs out."
       ]
     }
   ],
   "constraints": [
-    "Admin panel must remain protected behind Internet Identity authentication",
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
+    "Use hardcoded credentials: username 'admin', password 'admin123' — do not store them in the backend.",
+    "Do not modify files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Adding new authentication methods",
-    "Changing the admin panel access control",
-    "Redesigning the overall layout or color theme"
+    "Adding a backend authentication system or changing the Motoko actor.",
+    "Implementing role-based access control changes in the backend.",
+    "Redesigning any sections other than the hero headline and admin login."
   ],
   "imageRequirements": {
     "required": [],

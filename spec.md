@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Remove the login requirement for public-facing form submissions and style the hero tagline text to be big, bold, and orange.
+**Goal:** Remove the profile setup popup, update the hero headline, and replace the admin panel's Internet Identity login with a simple hardcoded username/password form.
 
 **Planned changes:**
-- Allow anonymous (non-logged-in) users to submit the Contact form, Estimate Calculator form, and Chatbot query form without requiring Internet Identity authentication
-- Update the backend actor to accept anonymous calls for the relevant form submission functions
-- Keep the admin panel protected behind Internet Identity authentication
-- Style the hero tagline text "urbantheekedaar we build structures that last generations" to be large, bold, and orange in color
+- Remove the `ProfileSetup` modal/component so it never appears after login or anywhere in the app
+- Update the Hero section's main headline to "Urban Thekedaar — We build structures for generations"
+- Replace the admin panel's Internet Identity authentication with a login form using hardcoded credentials (username: `admin`, password: `admin123`), showing an error message for incorrect credentials and granting full admin access on success
 
-**User-visible outcome:** Visitors can submit all public forms without logging in, and the hero section displays the tagline in a prominent large bold orange style.
+**User-visible outcome:** After logging in, users no longer see a profile setup popup. The homepage hero displays the new headline. Admins can access the admin panel by entering the hardcoded credentials instead of using Internet Identity.

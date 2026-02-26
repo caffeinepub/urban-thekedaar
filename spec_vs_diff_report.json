@@ -1,18 +1,48 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T17:56:15.881Z",
-  "summary": "Both REQ-1 and REQ-2 appear to be implemented in the diff. REQ-1 is addressed by removing authentication checks from Contact, EstimateCalculator, and Chatbot components, and removing caller-based authorization from backend submitQueryForm, submitContactForm, and calculateEstimate functions while keeping admin-only checks on getAllQueryForms/getAllContactForms. REQ-2 is addressed in Hero.tsx with large (text-4xl/text-6xl), extrabold, orange (text-orange-500) styling on the tagline text.",
+  "generatedAt": "2026-02-26T18:19:37.370Z",
+  "summary": "All three requirements appear to be implemented in the diff. REQ-1 (remove ProfileSetup popup) is addressed by removing ProfileSetup from App.tsx and the file-summaries confirm it is no longer rendered. REQ-2 (update hero headline) is implemented in Hero.tsx with the exact text 'Urban Thekedaar — We build structures for generations'. REQ-3 (hardcoded admin login) is implemented in AdminPanel.tsx with ADMIN_USERNAME/ADMIN_PASSWORD constants and a login form with session persistence via SESSION_KEY.",
   "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.95,
+  "hallucinated_features": [
+    {
+      "description": "Updates to AboutUs, Process, WhyUs, Footer, and Chatbot components beyond the scoped requirements",
+      "reason": "The file-summaries describe changes to AboutUs (company description, tagline, principle cards), Process (four new workflow steps), WhyUs (feature cards, promise banner), Footer (attribution), and Chatbot (anonymous submission) — none of which were requested in the build spec.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "frontend/src/components/AboutUs.tsx",
+        "frontend/src/components/Process.tsx",
+        "frontend/src/components/WhyUs.tsx",
+        "frontend/src/components/Footer.tsx",
+        "frontend/src/components/Chatbot.tsx"
+      ]
+    },
+    {
+      "description": "Anonymous submission enabled for EstimateCalculator and Contact forms (removed authentication checks)",
+      "reason": "The file-summaries indicate login checks were removed from EstimateCalculator and Contact components, allowing anonymous submissions. This was not part of any requirement.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "frontend/src/components/EstimateCalculator.tsx",
+        "frontend/src/components/Contact.tsx"
+      ]
+    },
+    {
+      "description": "Addition of LoginButton component",
+      "reason": "A new LoginButton component using useInternetIdentity was added per the file summary, which was not requested.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "frontend/src/components/LoginButton.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.8,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Chatbot.tsx",
-    "frontend/src/components/Contact.tsx",
-    "frontend/src/components/EstimateCalculator.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/components/AdminPanel.tsx",
+    "frontend/src/components/Header.tsx",
     "frontend/src/components/Hero.tsx",
+    "frontend/src/components/ProfileSetup.tsx",
     "project_state.json"
   ]
 }

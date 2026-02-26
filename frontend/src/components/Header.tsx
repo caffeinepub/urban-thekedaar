@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useIsCallerAdmin } from '@/hooks/useQueries';
 
 interface HeaderProps {
   onNavigate: (section: string) => void;
@@ -46,10 +44,6 @@ function UrbanThekedaarLogo() {
 export default function Header({ onNavigate }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
-  const { data: isAdmin } = useIsCallerAdmin();
-
   const navItems = [
     { label: 'About Us', id: 'about' },
     { label: 'Our Founder', id: 'founder' },
@@ -58,7 +52,6 @@ export default function Header({ onNavigate }: HeaderProps) {
     { label: 'Why Us', id: 'whyus' },
     { label: 'Calculator', id: 'calculator' },
     { label: 'Contact Us', id: 'contact', isOrange: true },
-    ...(isAuthenticated && isAdmin ? [{ label: 'Inquiries', id: 'admin', isOrange: false }] : []),
     { label: 'Admin', id: 'admin-panel', isOrange: true },
   ];
 

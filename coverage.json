@@ -1,54 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T17:56:15.884Z",
+  "generatedAt": "2026-02-26T18:19:37.373Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove Internet Identity authentication requirement from all public-facing form submissions. The Contact form, Estimate Calculator, and Chatbot query submission form must allow anonymous users to submit without logging in. Authentication should only be required for the admin panel.",
+        "summary": "Remove the 'Set up your profile' popup/modal (ProfileSetup component) so it no longer appears after login or anywhere in the application.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Contact.tsx",
-          "frontend/src/components/EstimateCalculator.tsx",
-          "frontend/src/components/Chatbot.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/App.tsx",
+          "frontend/src/components/ProfileSetup.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Contact.tsx",
-          "frontend/src/components/EstimateCalculator.tsx",
-          "frontend/src/components/Chatbot.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/components/ProfileSetup.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "In the Hero section, style the tagline text 'urbantheekedaar we build structures that last generations' to be big, bold, and orange in color.",
+        "summary": "Update the main hero headline in the Hero section to display 'Urban Thekedaar — We build structures for generations' as the primary headline text.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/Hero.tsx"
         ],
         "matchedFiles": [
           "frontend/src/components/Hero.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Replace the admin panel's Internet Identity authentication with a hardcoded username/password login form. Use credentials: username 'admin' and password 'admin123'. The admin panel should be accessible only after successfully entering these credentials, with an 'Access Denied' state shown for incorrect credentials.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AdminPanel.tsx",
+          "frontend/src/components/Header.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AdminPanel.tsx",
+          "frontend/src/components/Header.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/Chatbot.tsx",
-    "frontend/src/components/Contact.tsx",
-    "frontend/src/components/EstimateCalculator.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/components/AdminPanel.tsx",
+    "frontend/src/components/Header.tsx",
     "frontend/src/components/Hero.tsx",
+    "frontend/src/components/ProfileSetup.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

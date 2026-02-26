@@ -18,7 +18,7 @@ export default function Hero() {
       <div className="relative z-10 text-center text-white px-4 max-w-5xl mx-auto py-32">
         <div className="mb-6">
           <p className="text-4xl md:text-6xl font-extrabold text-orange-500 uppercase tracking-wide leading-tight drop-shadow-lg">
-            urbantheekedaar we build structures that last generations
+            Urban Thekedaar — We build structures for generations
           </p>
         </div>
         <p className="text-xl md:text-2xl text-gray-200 mb-4 max-w-3xl mx-auto leading-relaxed">

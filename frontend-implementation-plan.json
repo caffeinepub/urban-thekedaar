@@ -1,54 +1,64 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove login requirement for form submissions & style tagline",
+  "title": "Remove profile setup popup, update headline, and fix admin login",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove Internet Identity authentication requirement from all public-facing form submissions (Contact form, Estimate Calculator, Chatbot query submission). Authentication remains required only for admin panel access.",
+      "summary": "Remove the ProfileSetup modal so it no longer appears after login or anywhere in the application",
       "acceptanceCriteria": [
-        "A user who is not logged in can submit the Contact form successfully",
-        "A user who is not logged in can submit the Estimate Calculator form successfully",
-        "A user who is not logged in can submit a query via the Chatbot form successfully",
-        "The admin panel still requires Internet Identity login to access",
-        "Backend actor accepts anonymous calls for submitQueryForm, submitContactForm, and submitCalculatorLead"
+        "The ProfileSetup modal/dialog does not appear after a user logs in.",
+        "No 'Set up your profile' prompt is shown anywhere in the app.",
+        "The ProfileSetup component is either removed or never rendered."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Contact.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Remove the Internet Identity authentication requirement before form submission. Allow anonymous users to submit the contact form by removing the login check and using the anonymous actor from useActor. Update UI to remove login-related messaging and enable the submit button for all users."
+          "description": "Remove the ProfileSetup component import and remove all logic that conditionally renders the ProfileSetup modal. Remove the showProfileSetup state derivation and the ProfileSetup JSX element from the render tree."
         },
         {
-          "path": "frontend/src/components/EstimateCalculator.tsx",
-          "operation": "modify",
-          "description": "Remove the Internet Identity authentication requirement before form submission. Allow anonymous users to submit calculator leads by removing the login check and using the anonymous actor from useActor. Update UI to remove login-related messaging and enable form submission for all users."
-        },
-        {
-          "path": "frontend/src/components/Chatbot.tsx",
-          "operation": "modify",
-          "description": "Remove the Internet Identity authentication requirement before query form submission. Allow anonymous users to submit queries by removing the login check and using the anonymous actor from useActor. Update UI to remove login button/prompt from the query submission flow while keeping other chatbot functionality intact."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Update the mutation hooks for submitContactForm, submitQueryForm, and calculateEstimate to work with both authenticated and anonymous actors. Ensure these mutations do not require an authenticated actor and can execute using the anonymous actor from useActor."
+          "path": "frontend/src/components/ProfileSetup.tsx",
+          "operation": "delete",
+          "description": "Delete the ProfileSetup component file as it is no longer needed in the application."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Style the Hero section tagline 'urbantheekedaar we build structures that last generations' to be big, bold, and orange in color.",
+      "summary": "Update the main hero headline to display 'Urban Thekedaar — We build structures for generations'",
       "acceptanceCriteria": [
-        "The text 'urbantheekedaar we build structures that last generations' is displayed in a large font size",
-        "The text is bold (font-weight bold or semibold)",
-        "The text color is orange"
+        "The Hero section displays 'Urban Thekedaar — We build structures for generations' as the main headline.",
+        "The headline is visually prominent and styled consistently with the existing hero design."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/Hero.tsx",
           "operation": "modify",
-          "description": "Update the tagline text 'urbantheekedaar we build structures that last generations' styling to use large font size (text-4xl or text-5xl), bold font weight (font-bold or font-semibold), and orange color (using Tailwind orange classes like text-orange-500 or text-orange-600). Ensure the tagline remains visually prominent within the Hero section layout."
+          "description": "Update the primary headline text in the Hero section to display 'Urban Thekedaar — We build structures for generations'. Preserve all existing styling and layout while changing only the headline text content."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Replace Internet Identity authentication in the admin panel with a hardcoded username/password login form using credentials admin/admin123",
+      "acceptanceCriteria": [
+        "The admin panel shows a login form with username and password fields instead of (or before) Internet Identity login.",
+        "Entering 'admin' / 'admin123' grants access to the admin dashboard.",
+        "Entering incorrect credentials shows an error message (e.g., 'Access Denied' or 'Invalid credentials').",
+        "After successful login, the admin panel content is fully accessible.",
+        "The admin session persists until the user logs out."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AdminPanel.tsx",
+          "operation": "modify",
+          "description": "Replace the Internet Identity authentication flow with a hardcoded username/password login form. Add local state for username, password, authentication status, and error messages. Implement form validation that checks username === 'admin' and password === 'admin123'. Show 'Access Denied' or 'Invalid credentials' error for incorrect credentials. Use sessionStorage or localStorage to persist the admin session. Conditionally render either the login form or the admin dashboard content based on authentication status. Add a logout button that clears the session and returns to the login form."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Update the conditional logic for showing the 'Inquiries' admin link to check the new hardcoded admin authentication state instead of the Internet Identity isAdmin check. Ensure the link only appears when the user has successfully logged in with the hardcoded credentials."
         }
       ]
     }

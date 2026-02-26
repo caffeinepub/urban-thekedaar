@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-internet-identity-authentication-requirement-from-all-public-facing-form-submissions-the-contact-form-estimate-calculator-and-chatbot-query-submission-form-must-allow-anonymous-users-to-submit-without-logging-in-authentication-should-only-be-required-for-the-admin-panel",
-      "featureTitle": "Remove Internet Identity authentication requirement from all public-facing form submissions. The Contact form, Estimate Calculator, and Chatbot query submission form must allow anonymous users to submit without logging in. Authentication should only be required for the admin panel.",
+      "featureId": "feature-remove-the-set-up-your-profile-popup-modal-profilesetup-component-so-it-no-longer-appears-after-login-or-anywhere-in-the-application",
+      "featureTitle": "Remove the 'Set up your profile' popup/modal (ProfileSetup component) so it no longer appears after login or anywhere in the application.",
       "files": [
-        "frontend/src/components/Chatbot.tsx",
-        "frontend/src/components/Contact.tsx",
-        "frontend/src/components/EstimateCalculator.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/components/ProfileSetup.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -23,8 +22,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-in-the-hero-section-style-the-tagline-text-urbantheekedaar-we-build-structures-that-last-generations-to-be-big-bold-and-orange-in-color",
-      "featureTitle": "In the Hero section, style the tagline text 'urbantheekedaar we build structures that last generations' to be big, bold, and orange in color.",
+      "featureId": "feature-update-the-main-hero-headline-in-the-hero-section-to-display-urban-thekedaar-we-build-structures-for-generations-as-the-primary-headline-text",
+      "featureTitle": "Update the main hero headline in the Hero section to display 'Urban Thekedaar — We build structures for generations' as the primary headline text.",
       "files": [
         "frontend/src/components/Hero.tsx"
       ],
@@ -38,6 +37,26 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-replace-the-admin-panel-s-internet-identity-authentication-with-a-hardcoded-username-password-login-form-use-credentials-username-admin-and-password-admin123-the-admin-panel-should-be-accessible-only-after-successfully-entering-these-credentials-with-an-access-denied-state-shown-for-incorrect-credentials",
+      "featureTitle": "Replace the admin panel's Internet Identity authentication with a hardcoded username/password login form. Use credentials: username 'admin' and password 'admin123'. The admin panel should be accessible only after successfully entering these credentials, with an 'Access Denied' state shown for incorrect credentials.",
+      "files": [
+        "frontend/src/components/AdminPanel.tsx",
+        "frontend/src/components/Header.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

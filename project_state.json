@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Urban Thekedaar website project with chatbot, calculator, and admin panel features being built.",
+  "architectural_notes": [
+    "Chatbot uses keyword-matching approach (no external AI API) for automated Q&A responses",
+    "Form submission data stored on-site; admin can review via protected admin panel"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-add-a-floating-chatbot-component-with-keyword-based-automated-q-a-covering-urban-thekedaar-s-services-pricing-bookings-and-faqs-the-chatbot-must-match-user-input-against-predefined-keywords-and-return-relevant-responses-about-construction-services-cost-ranges-booking-process-and-common-questions",
+      "title": "Add a floating chatbot component with keyword-based automated Q&A covering Urban Thekedaar's services, pricing, bookings, and FAQs. The chatbot must match user input against predefined keywords and return relevant responses about construction services, cost ranges, booking process, and common questions.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-query-form-inside-or-alongside-the-chatbot-or-as-a-dedicated-section-that-collects-name-phone-email-service-type-dropdown-and-message-on-submission-the-data-must-be-stored-in-the-backend-and-a-confirmation-message-shown-to-the-user",
+      "title": "Add a query form inside or alongside the chatbot (or as a dedicated section) that collects: name, phone, email, service type (dropdown), and message. On submission, the data must be stored in the backend and a confirmation message shown to the user.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-estimatecalculator-component-and-backend-to-include-name-and-mobile-number-fields-these-fields-must-be-collected-alongside-the-existing-estimate-inputs-and-stored-as-calculator-leads-in-the-backend",
+      "title": "Update the EstimateCalculator component and backend to include name and mobile number fields. These fields must be collected alongside the existing estimate inputs and stored as calculator leads in the backend.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-an-admin-panel-page-section-accessible-via-a-hardcoded-username-and-password-login-no-internet-identity-required-once-logged-in-the-admin-can-view-all-submitted-query-form-entries-and-all-calculator-leads-in-separate-tabs-or-sections-the-hardcoded-credentials-must-be-defined-as-constants-in-the-frontend-code",
+      "title": "Create an Admin Panel page/section accessible via a hardcoded username and password login (no Internet Identity required). Once logged in, the admin can view all submitted query form entries and all calculator leads in separate tabs or sections. The hardcoded credentials must be defined as constants in the frontend code.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Chatbot with keyword-based Q&A (services, pricing, bookings, FAQs) and query form (name, phone, email, service type, message) with on-site data storage",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Cost/service calculator with name and mobile number fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Admin panel with hardcoded login (username + password) to view submitted queries and calculator leads",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Update the backend to store query form submissions with fields: name, phone, email, service type, and message. Expose a method to submit a query and a method (admin-only) to retrieve all query submissions.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Update the backend to store calculator leads with fields: name, mobile, and all existing estimate inputs (project type, area, floors, quality tier, address). Expose an admin-only method to retrieve all calculator leads.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Urban Thekedaar",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

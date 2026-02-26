@@ -1,0 +1,104 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Chatbot Q&A + Query Form, Calculator Lead Capture, and Admin Panel",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add a floating chatbot component with keyword-based automated Q&A covering Urban Thekedaar's services, pricing, bookings, and FAQs",
+      "acceptanceCriteria": [
+        "Chatbot widget is visible and accessible on the site as a floating button",
+        "Typing service-related keywords returns a relevant predefined answer",
+        "Typing pricing-related keywords returns cost/pricing information",
+        "Typing booking-related keywords returns booking process information",
+        "Unanswered queries prompt the user to use the query form"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Chatbot.tsx",
+          "operation": "modify",
+          "description": "Enhance the existing chatbot component to include comprehensive keyword matching for services (construction, renovation, interior design, architectural planning), pricing (cost ranges, estimates, budget), bookings (how to book, process, scheduling), and FAQs (materials, timeline, permits, warranty). Add a fallback message directing users to the query form when no keyword match is found. Ensure the chatbot remains accessible as a floating button and maintains its existing dialog UI structure."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add a query form inside or alongside the chatbot that collects name, phone, email, service type, and message, with backend storage and confirmation",
+      "acceptanceCriteria": [
+        "Query form has fields: name, phone, email, service type (dropdown), message",
+        "Form validates required fields before submission",
+        "Submitted data is persisted in the backend canister",
+        "User sees a success confirmation after submission"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Chatbot.tsx",
+          "operation": "modify",
+          "description": "Add a query form within the chatbot dialog that includes fields for name, phone, email, service type (dropdown with options: Construction, Renovation, Interior Design, Architectural Planning, Other), and message. Implement form validation for all required fields. Wire the form submission to the useSubmitQueryForm mutation hook from frontend/src/hooks/useQueries.ts. Display a success message within the chatbot after successful submission and clear the form fields."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a useSubmitQueryForm mutation hook that calls the backend submitQueryForm method with name, phone, email, serviceType, and message parameters. Include proper error handling and success callbacks. Follow the existing pattern used for useSubmitContactForm mutation."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Update the EstimateCalculator component to include name and mobile number fields for lead capture",
+      "acceptanceCriteria": [
+        "Calculator form includes a name field and a mobile number field",
+        "Name and mobile are required before submitting the estimate",
+        "Submitted calculator leads (name, mobile, project details) are stored in the backend",
+        "Backend exposes a method to retrieve calculator leads (admin-only)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/EstimateCalculator.tsx",
+          "operation": "modify",
+          "description": "Add name and mobile number input fields to the estimate calculator form. Position these fields at the top of the form before the existing project type field. Make both fields required with appropriate validation (name: text, mobile: phone format). Update the form submission to call the backend calculateEstimate method which already accepts name and mobile as the first two parameters. Ensure the existing estimate calculation flow remains intact while capturing lead information."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Verify that the useCalculateEstimate mutation hook correctly passes name and mobile parameters to the backend calculateEstimate method as the first two arguments, before projectType and other estimate inputs. Update the hook signature and invocation if needed to match the backend interface parameters order."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Create an Admin Panel page accessible via hardcoded username and password login to view query submissions and calculator leads",
+      "acceptanceCriteria": [
+        "A login screen with username and password fields is shown before accessing the admin panel",
+        "Entering the correct hardcoded credentials grants access to the admin panel",
+        "Entering wrong credentials shows an error message",
+        "Admin panel displays all query form submissions with name, phone, email, service type, and message",
+        "Admin panel displays all calculator leads with name, mobile, and project details",
+        "Submissions and leads are displayed in a readable table or card list",
+        "Admin can log out and return to the login screen"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AdminPanel.tsx",
+          "operation": "create",
+          "description": "Create a new AdminPanel component that implements a hardcoded credential login screen (username: 'admin', password: 'urbanadmin2024' as constants at the top of the file). After successful login, display two tabs or sections: one for Query Form Submissions and one for Calculator Leads. Use the useGetAllQueryForms and useGetAllCalculatorLeads query hooks from frontend/src/hooks/useQueries.ts to fetch data. Display query submissions showing name, phone, email, service type, and message in a table or card grid. Display calculator leads showing name, mobile, project type, area, floors, quality tier, and full address in a separate table or card grid. Include a logout button that clears the session and returns to the login screen. Use shadcn/ui components (Card, Table, Tabs, Button, Input, Alert) for consistent UI. Implement loading states and error handling for data fetching."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add two new query hooks: useGetAllQueryForms that calls the backend getAllQueryForms method, and useGetAllCalculatorLeads that calls the backend getAllCalculatorLeads method. Both hooks should use useQuery from @tanstack/react-query, depend on the actor being available, and follow the existing pattern used for other query hooks in this file. Include proper TypeScript types from frontend/src/backend.d.ts (QueryForm[] and CalculatorLead[])."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add a conditional route or section that renders the AdminPanel component when the URL path or hash matches '/admin' or when a specific state flag is set. Keep the existing sections (Hero, Process, EstimateCalculator, etc.) accessible at the root route. Use React Router or a simple hash-based routing mechanism to toggle between the main site and the admin panel. Do not remove or modify the existing AdminInquiries component rendering logic."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Add an 'Admin' navigation link in the header that navigates to the admin panel route (/admin or #admin). Position this link after the existing navigation items. The link should be visible to all users (not restricted to authenticated users) since the admin panel implements its own hardcoded login screen."
+        }
+      ]
+    }
+  ]
+}

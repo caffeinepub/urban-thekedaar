@@ -1,0 +1,86 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-floating-chatbot-component-with-keyword-based-automated-q-a-covering-urban-thekedaar-s-services-pricing-bookings-and-faqs-the-chatbot-must-match-user-input-against-predefined-keywords-and-return-relevant-responses-about-construction-services-cost-ranges-booking-process-and-common-questions",
+      "featureTitle": "Add a floating chatbot component with keyword-based automated Q&A covering Urban Thekedaar's services, pricing, bookings, and FAQs. The chatbot must match user input against predefined keywords and return relevant responses about construction services, cost ranges, booking process, and common questions.",
+      "files": [
+        "frontend/src/components/Chatbot.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-query-form-inside-or-alongside-the-chatbot-or-as-a-dedicated-section-that-collects-name-phone-email-service-type-dropdown-and-message-on-submission-the-data-must-be-stored-in-the-backend-and-a-confirmation-message-shown-to-the-user",
+      "featureTitle": "Add a query form inside or alongside the chatbot (or as a dedicated section) that collects: name, phone, email, service type (dropdown), and message. On submission, the data must be stored in the backend and a confirmation message shown to the user.",
+      "files": [
+        "frontend/src/components/Chatbot.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-estimatecalculator-component-and-backend-to-include-name-and-mobile-number-fields-these-fields-must-be-collected-alongside-the-existing-estimate-inputs-and-stored-as-calculator-leads-in-the-backend",
+      "featureTitle": "Update the EstimateCalculator component and backend to include name and mobile number fields. These fields must be collected alongside the existing estimate inputs and stored as calculator leads in the backend.",
+      "files": [
+        "frontend/src/components/EstimateCalculator.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-an-admin-panel-page-section-accessible-via-a-hardcoded-username-and-password-login-no-internet-identity-required-once-logged-in-the-admin-can-view-all-submitted-query-form-entries-and-all-calculator-leads-in-separate-tabs-or-sections-the-hardcoded-credentials-must-be-defined-as-constants-in-the-frontend-code",
+      "featureTitle": "Create an Admin Panel page/section accessible via a hardcoded username and password login (no Internet Identity required). Once logged in, the admin can view all submitted query form entries and all calculator leads in separate tabs or sections. The hardcoded credentials must be defined as constants in the frontend code.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/AdminPanel.tsx",
+        "frontend/src/components/Header.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

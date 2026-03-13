@@ -1,0 +1,130 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Deep Navy Blue primary */
+    --background: 0.97 0.005 250;
+    --foreground: 0.14 0.04 250;
+
+    --card: 1 0 0;
+    --card-foreground: 0.14 0.04 250;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.14 0.04 250;
+
+    /* Navy primary */
+    --primary: 0.18 0.06 252;
+    --primary-foreground: 1 0 0;
+
+    /* Gold accent */
+    --accent: 0.72 0.11 85;
+    --accent-foreground: 0.14 0.04 250;
+
+    --secondary: 0.94 0.005 250;
+    --secondary-foreground: 0.14 0.04 250;
+
+    --muted: 0.94 0.005 250;
+    --muted-foreground: 0.45 0.03 250;
+
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 1 0 0;
+
+    --border: 0.88 0.01 250;
+    --input: 0.88 0.01 250;
+    --ring: 0.72 0.11 85;
+
+    --radius: 0.5rem;
+
+    /* Navy dark for sections */
+    --navy: 0.14 0.06 252;
+    --navy-deep: 0.09 0.04 252;
+    --gold: 0.72 0.11 85;
+    --gold-light: 0.82 0.09 85;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .font-display {
+    font-family: "Playfair Display", serif;
+  }
+
+  .font-body {
+    font-family: "DM Sans", system-ui, sans-serif;
+  }
+
+  .section-navy {
+    background-color: oklch(var(--navy));
+  }
+
+  .section-navy-deep {
+    background-color: oklch(var(--navy-deep));
+  }
+
+  .text-gold {
+    color: oklch(var(--gold));
+  }
+
+  .bg-gold {
+    background-color: oklch(var(--gold));
+  }
+
+  .border-gold {
+    border-color: oklch(var(--gold));
+  }
+
+  .scroll-smooth-container {
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gold-underline::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: oklch(var(--gold));
+    margin-top: 0.5rem;
+  }
+
+  .gold-underline-center::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: oklch(var(--gold));
+    margin: 0.5rem auto 0;
+  }
+}
